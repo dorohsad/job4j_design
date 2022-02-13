@@ -1,24 +1,29 @@
 package ru.job4j.it;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class FlatMap<T> implements Iterator<T> {
+
     private final Iterator<Iterator<T>> data;
-    int index;
-    List<T> list;
+    private Iterator<T> cursor = Collections.emptyIterator();
 
     public FlatMap(Iterator<Iterator<T>> data) {
         this.data = data;
-        list = flat(data);
     }
 
-    @SuppressWarnings("checkstyle:EmptyForIteratorPad")
     @Override
     public boolean hasNext() {
-        return index < list.size();
+        while (data.hasNext() && !cursor.hasNext()) {
+            Iterator<T> nextIterator = data.next();
+            if (nextIterator.hasNext()) {
+                cursor = nextIterator;
+                break;
+            }
+        }
+        return (cursor.hasNext());
     }
 
     @Override
@@ -26,18 +31,7 @@ public class FlatMap<T> implements Iterator<T> {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
-        return list.get(index++);
-    }
-
-    public List<T> flat(Iterator<Iterator<T>> data) {
-        return asStream(data)
-                .flatMap(FlatMap::asStream)
-                .collect(Collectors.toList());
-    }
-
-    public static <T> Stream<T> asStream(Iterator<T> source) {
-        Iterable<T> iterable = () -> source;
-        return StreamSupport.stream(iterable.spliterator(), false);
+        return cursor.next();
     }
 
     public static void main(String[] args) {
