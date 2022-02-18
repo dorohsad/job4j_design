@@ -3,6 +3,7 @@ package ru.job4j.list;
 import java.util.*;
 
 public class SimpleArrayList<T> implements List<T> {
+    private static final int DEFAULT_CAPACITY = 10;
 
     private T[] container;
 
@@ -16,22 +17,25 @@ public class SimpleArrayList<T> implements List<T> {
 
     @Override
     public void add(T value) {
-        if (size == container.length - 1) {
-            container = Arrays.copyOf(container, container.length * 2);
+        if (size == container.length) {
+            container = getContainer();
         }
         container[size++] = value;
         modCount++;
     }
 
+
     @Override
     public T set(int index, T newValue) {
-        container[Objects.checkIndex(index, size)] = newValue;
+        Objects.checkIndex(index, size);
+        container[index] = newValue;
         return container[index];
     }
 
     @Override
     public T remove(int index) {
-        T temp = container[Objects.checkIndex(index, size)];
+        Objects.checkIndex(index, size);
+        T temp = container[index];
         System.arraycopy(container, index + 1,
                 container, index, container.length - index - 1);
         container[container.length - 1] = null;
@@ -42,7 +46,8 @@ public class SimpleArrayList<T> implements List<T> {
 
     @Override
     public T get(int index) {
-        return container[Objects.checkIndex(index, size)];
+        Objects.checkIndex(index, size);
+        return container[index];
     }
 
     @Override
@@ -59,6 +64,9 @@ public class SimpleArrayList<T> implements List<T> {
 
             @Override
             public boolean hasNext() {
+                if (expectedModCount != modCount) {
+                    throw new ConcurrentModificationException();
+                }
                 return point < size;
             }
 
@@ -67,11 +75,17 @@ public class SimpleArrayList<T> implements List<T> {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                if (expectedModCount != modCount) {
-                    throw new ConcurrentModificationException();
-                }
                 return container[point++];
             }
         };
+    }
+
+    private T[] getContainer() {
+        if (container.length == 0) {
+            container = (T[]) new Object[DEFAULT_CAPACITY];
+        } else {
+            container = Arrays.copyOf(container, container.length * 2);
+        }
+        return container;
     }
 }
