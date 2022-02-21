@@ -42,15 +42,33 @@ public class ForwardLinked<T> implements Iterable<T> {
     }
 
     public T deleteFirst() {
-        if (head == null) {
-            throw new NoSuchElementException();
-        }
+        checkEmpty();
         Node<T> node = head;
         head = node.next;
         T value = node.value;
         node.next = null;
         node.value = null;
         return value;
+    }
+
+    public T deleteLast() {
+        checkEmpty();
+        Node<T> tail = head;
+        Node<T> prev = head;
+        while (tail.next != null) {
+            prev = tail;
+            tail = tail.next;
+        }
+        T value = tail.value;
+        tail.value = null;
+        prev.next = null;
+        return value;
+    }
+
+    private void checkEmpty() {
+        if (head == null) {
+            throw new NoSuchElementException();
+        }
     }
 
     private static class Node<T> {
