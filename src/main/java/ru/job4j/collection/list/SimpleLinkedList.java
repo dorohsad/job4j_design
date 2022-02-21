@@ -6,15 +6,15 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class SimpleLinkedList<E> implements List<E> {
-    private SimpleLinkedList.Node<E> first;
-    private SimpleLinkedList.Node<E> last;
+    private Node<E> first;
+    private Node<E> last;
     int size;
     int modCount;
 
     @Override
     public void add(E value) {
-        final SimpleLinkedList.Node<E> l = last;
-        final SimpleLinkedList.Node<E> newNode = new SimpleLinkedList.Node<>(l, value, null);
+        final Node<E> l = last;
+        final Node<E> newNode = new Node<>(l, value, null);
         last = newNode;
         if (l == null) {
             first = newNode;
@@ -34,7 +34,7 @@ public class SimpleLinkedList<E> implements List<E> {
     @Override
     public Iterator<E> iterator() {
         return new Iterator<E>() {
-            private SimpleLinkedList.Node<E> next = first;
+            private Node<E> next = first;
             private int nextIndex;
             private final int expectedModCount = modCount;
 
@@ -58,9 +58,9 @@ public class SimpleLinkedList<E> implements List<E> {
     }
 
 
-    SimpleLinkedList.Node<E> node(int index) {
+    private Node<E> node(int index) {
 
-        SimpleLinkedList.Node<E> x = first;
+        Node<E> x = first;
         for (int i = 0; i < index; i++) {
             x = x.next;
         }
@@ -69,10 +69,10 @@ public class SimpleLinkedList<E> implements List<E> {
 
     private static class Node<E> {
         E item;
-        SimpleLinkedList.Node<E> next;
-        SimpleLinkedList.Node<E> prev;
+        Node<E> next;
+        Node<E> prev;
 
-        Node(SimpleLinkedList.Node<E> prev, E element, SimpleLinkedList.Node<E> next) {
+        Node(Node<E> prev, E element, Node<E> next) {
             this.item = element;
             this.next = next;
             this.prev = prev;
