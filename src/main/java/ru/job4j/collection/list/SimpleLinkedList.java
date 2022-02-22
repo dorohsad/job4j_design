@@ -49,9 +49,7 @@ public class SimpleLinkedList<E> implements List<E> {
                     throw new NoSuchElementException();
                 }
                 Node<E> lastReturned = next;
-                if (next != null) {
-                    next = next.next;
-                }
+                next = next.next;
                 return lastReturned.item;
             }
         };
